@@ -23,11 +23,11 @@ def parse_eeprom(data):
         ("Brand",               0xE1,    1,     lookup(brand)),
         ("Platform",            0xE2,    1,	    lookup(platform)),
         ("Long Coding LC",      0xF1,   25,     hexlify),
-        ("Model ID",            0xF1+0,  3,     hexlify),
-        ("byte_3_Country_Navigation",0xF1+3, 1, hexlify),
-        ("External Sound",      0xF1+11, 1,     hexlify),
-        ("byte_17_Skinning",    0xF1+17, 1,     hexlify),
-        ("byte_18_Screenings",  0xF1+18, 1,     hexlify),
+        ("LC:Model ID",            0xF1+0,  3,     hexlify),
+        ("LC:byte_3_Country_Navigation",0xF1+3, 1, hexlify),
+        ("LC:External Sound",      0xF1+11, 1,     hexlify),
+        ("LC:byte_17_Skinning",    0xF1+17, 1,     hexlify),
+        ("LC:byte_18_Screenings",  0xF1+18, 1,     hexlify),
         ("Dataset Number",      0x12e,  15,     string),
     )
 

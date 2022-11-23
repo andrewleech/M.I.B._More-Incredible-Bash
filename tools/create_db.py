@@ -18,15 +18,20 @@ logging.basicConfig(
     stream_handler]
 )
 
-HEADINGS = "MU", "Train", "Region_ASCII", "Train_Brand", "PN_model", "PN_INDEX", "PN_Ident", "Hardware Number", "Unit Type", "Unit class", "Tel", "NAV", "DAB", "Sirius", "LTE", "Feature byte", "Region", "Brand", "Platform", "byte_17", "byte_18", "Model ID", "Dataset Number", "ifs_header_checksum", "ifs_SHA1", "ifs_header_checksum_patch", "RCC_address", "SHA1_patch"
-db_file = Path("unit_db")
+db_file = Path("unit_db.csv")
+
+HEADINGS = "MU", "Train", "Region_ASCII", "Train_Brand", "PN_model", "PN_INDEX", "PN_Ident", "Hardware Number", "Unit Type", "Unit class", "Feat:Tel", "Feat:NAV", "Feat:DAB", "Feat:Sirius", "Feat:LTE", "Feature byte", "Region", "Brand", "Platform", "LC:byte_17_Skinning", "LC:byte_18_Screenings", "LC:Model ID", "Dataset Number", "ifs_header_checksum", "ifs_SHA1", "ifs_header_checksum_patch", "RCC_address", "SHA1_patch"
+FIELD_SEP = ","
 
 def assemble_db(backup_details, patch_details):
     csv = [
-        ";".join(HEADINGS)
+        FIELD_SEP.join(HEADINGS)
     ]
     for detail in backup_details:
         train = detail["Train"]
+        train_brand, train_region = train_split(train)
+        detail["Train_Brand"] = train_brand
+        detail["Region_ASCII"] = train_region
         pt = {t:d for t, d in patch_details.items() if t.startswith(train)}
         if not pt:
             logging.warning(f"No patch for: {train}")
@@ -38,8 +43,7 @@ def assemble_db(backup_details, patch_details):
         
         detail["PN_model"], detail["PN_INDEX"], detail["PN_Ident"] = PN1_split(detail["PN1"])
         
-        #detail["Region_ASCII"] = detail["Region"]
-        row = ";".join([b2s(detail.get(f, "")) for f in HEADINGS])
+        row = FIELD_SEP.join([b2s(detail.get(f, "")) for f in HEADINGS])
         csv.append(row)
         
     logging.info(f"database written: {db_file}")
@@ -48,6 +52,12 @@ def assemble_db(backup_details, patch_details):
 
 def b2s(b):
     return str(b, "utf8") if isinstance(b, bytes) else str(b)
+
+
+def train_split(train):
+    hdr, region, brand, *vers = train.upper().split("_")
+    return region, brand
+
 
 def PN1_split(pn1):
     PN_model = pn1[0:6]
