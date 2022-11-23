@@ -3,12 +3,12 @@ from binascii import hexlify as hexlify_bytes
 def parse_eeprom(data):
     EEPROM = (
         # Name,                 Offset, Length, Converter
-        ("PN1",                 0x80,   10,     bytes_stripped), 
-        ("PN2",                 0x8B,   10,     bytes_stripped), 
-        ("Hardware Number",     0x96,    3,     bytes), 
-        ("Variant2",            0xBA,   13,     bytes_stripped), 
-        ("Train",               0x3A0,  19,     bytes_stripped), 
-        ("MU",                  0x3B9,   4,     bytes), 
+        ("PN1",                 0x80,   10,     str_stripped), 
+        ("PN2",                 0x8B,   10,     str_stripped), 
+        ("Hardware Number",     0x96,    3,     string), 
+        ("Variant2",            0xBA,   13,     str_stripped), 
+        ("Train",               0x3A0,  19,     str_stripped), 
+        ("MU",                  0x3B9,   4,     string), 
         ("Unit Type",           0xDD, 	 1,     lookup(unit_type)),
         ("Unit class",          0xDE, 	 1,     lookup(unit_class)),
         ("Feature byte",        0xDF,    1,     bin),
@@ -28,7 +28,7 @@ def parse_eeprom(data):
         ("External Sound",      0xF1+11, 1,     hexlify),
         ("byte_17_Skinning",    0xF1+17, 1,     hexlify),
         ("byte_18_Screenings",  0xF1+18, 1,     hexlify),
-        ("Dataset Number",      0x12e,  15,     bytes),
+        ("Dataset Number",      0x12e,  15,     string),
     )
 
     details = {}
@@ -43,6 +43,12 @@ def parse_eeprom(data):
 def bytes_stripped(b):
     return bytes(b).strip()
     
+def str_stripped(b):
+    return string(bytes_stripped(b))
+    
+def string(b):
+    return str(b, "utf8") if isinstance(b, bytes) else str(b)
+
 
 def bit(offset):
     def ret_bit(value):
