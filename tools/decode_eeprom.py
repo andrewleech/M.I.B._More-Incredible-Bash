@@ -10,7 +10,9 @@ def parse_eeprom(data):
         ("Train",               0x3A0,  19,     str_stripped), 
         ("MU",                  0x3B9,   4,     string), 
         ("Unit Type",           0xDD, 	 1,     lookup(unit_type)),
+        ("Unit Type_HEX",           0xDD, 	 1,     hexlify),
         ("Unit class",          0xDE, 	 1,     lookup(unit_class)),
+        ("Unit class_HEX",          0xDE, 	 1,     hexlify),
         ("Feature byte",        0xDF,    1,     bin),
         ("Feat:Tel",            0xDF,    1,     bit(0)),
         ("Feat:NAV",            0xDF,    1,     bit(1)),
@@ -20,8 +22,11 @@ def parse_eeprom(data):
         ("Feat:2DNAv",          0xDF,    1,     bit(5)),
         ("Feat:MMI Radio",      0xDF,    1,     bit(6)),  
         ("Region",              0xE0,    1,     lookup(region)),
+        ("Region_HEX",              0xE0,    1,     hexlify),
         ("Brand",               0xE1,    1,     lookup(brand)),
+        ("Brand_HEX",               0xE1,    1,     hexlify),
         ("Platform",            0xE2,    1,	    lookup(platform)),
+        ("Platform_HEX",            0xE2,    1,	    hexlify),
         ("Long Coding LC",      0xF1,   25,     hexlify),
         ("LC:Model ID",            0xF1+0,  3,     hexlify),
         ("LC:byte_3_Country_Navigation",0xF1+3, 1, hexlify),
@@ -29,6 +34,8 @@ def parse_eeprom(data):
         ("LC:byte_17_Skinning",    0xF1+17, 1,     hexlify),
         ("LC:byte_18_Screenings",  0xF1+18, 1,     hexlify),
         ("Dataset Number",      0x12e,  15,     string),
+        ("FAZIT ID",      0x9e, 17,     string),
+        ("MIB SN",      0xd0, 12,     string),
     )
 
     details = {}

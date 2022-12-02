@@ -20,8 +20,12 @@ logging.basicConfig(
 
 db_file = Path("unit_db.csv")
 
-HEADINGS = "MU", "Train", "Region_ASCII", "Train_Brand", "PN_model", "PN_INDEX", "PN_Ident", "Hardware Number", "Unit Type", "Unit class", "Feat:Tel", "Feat:NAV", "Feat:DAB", "Feat:Sirius", "Feat:LTE", "Feature byte", "Region", "Brand", "Platform", "LC:byte_17_Skinning", "LC:byte_18_Screenings", "LC:Model ID", "Dataset Number", "ifs_header_checksum", "ifs_SHA1", "ifs_header_checksum_patch", "RCC_address", "SHA1_patch"
-FIELD_SEP = ","
+#add change Headings to change output order or fields
+HEADINGS = "MU", "Train", "Train_Region", "Train_Brand", "PN_model", "PN_Ident", "PN_INDEX", "Hardware Number", "Unit Type", "Unit Type_HEX", "Unit class", "Unit class_HEX", "Feat:Tel", "Feat:NAV", "Feat:DAB", "Feat:Sirius", "Feat:LTE", "Feature byte", "Variant2", "Region", "Region_HEX", "Brand", "Brand_HEX", "Platform", "Platform_HEX", "LC:byte_17_Skinning", "LC:byte_18_Screenings", "LC:Model ID", "Long Coding LC", "Dataset Number", "ifs_header_checksum", "ifs_SHA1", "ifs_header_checksum_patch", "RCC_address", "SHA1_patch", "FAZIT ID", "MIB SN"
+
+# adjust to equired output format. ',' = rest of the world ';' for Germany
+# adding \t in front of the delimiter will prevent conversion to date/number in Excel
+FIELD_SEP = "\t;" 
 
 def assemble_db(backup_details, patch_details):
     csv = [
@@ -31,7 +35,7 @@ def assemble_db(backup_details, patch_details):
         train = detail["Train"]
         train_brand, train_region = train_split(train)
         detail["Train_Brand"] = train_brand
-        detail["Region_ASCII"] = train_region
+        detail["Train_Region"] = train_region
         pt = {t:d for t, d in patch_details.items() if t.startswith(train)}
         if not pt:
             logging.warning(f"No patch for: {train}")
@@ -55,7 +59,7 @@ def b2s(b):
 
 
 def train_split(train):
-    hdr, region, brand, *vers = train.upper().split("_")
+    hdr, brand, region, *vers = train.upper().split("_")
     return region, brand
 
 
@@ -82,7 +86,7 @@ def sha1sum(filename):
 def parse_backups(backups_dir: Path):
     logging.info(f"Parsing backups in: {backups_dir} ({backups_dir.exists()})")
     backup_details = list()
-    for eeprom in backups_dir.glob("**/*-EEProm.bin"):
+    for eeprom in backups_dir.glob("*/*-EEProm.bin"): # Change to "**/*-EEProm.bin" to enable scan of sub directories
         backup = eeprom.parent
         logging.info(f"Backup: {backup.name}")
         if os.path.getsize(eeprom) != 8192:
