@@ -7,6 +7,7 @@ from pathlib import Path
 from pprint import pp
 
 from decode_eeprom import parse_eeprom
+from decode_ifs_header import parse_ifs
 
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.INFO)
@@ -93,21 +94,29 @@ def parse_backups(backups_dir: Path):
             logging.warning(f"Unexpected eeprom size: {os.path.getsize(eeprom)}")
         with eeprom.open("rb") as data:
             details = parse_eeprom(data)
-        for ifs in backup.glob("*.ifs"): # todo make more explicit
+        for ifs in backup.glob("*-ifs-root-part2*.ifs"):
             details["ifs_SHA1"] = sha1sum(ifs)
+        for ifs_header in backup.glob("*-ifs-root-part2*.ifs"):
+            with ifs_header.open("rb") as data:
+                ifs_details = parse_ifs(data)
+                details.update(ifs_details)
+                
         backup_details.append(details)
-        
-    return backup_details
 
+    return backup_details
 
 def parse_patches(patches_dir: Path):
     logging.info("Scanning patches")
     patch_details = dict()
-    for ifs in patches_dir.glob("**/*.ifs"):
+    for ifs in patches_dir.glob("*/*.ifs"):
         train = ifs.parent.name.replace("_PATCH", "")
         logging.warning(f"{train}: {ifs}")
         sha1 = sha1sum(ifs)
         patch_details[train] = (ifs, sha1)
+        for ifs_header in backup.glob("*-ifs-root-part2*.ifs"):
+        with ifs_header.open("rb") as data:
+            ifs_details = parse_ifs(data)
+            patch_details.update(ifs_details)
 
     return patch_details
 
@@ -121,7 +130,8 @@ def main():
     
     patch_details = parse_patches(args.patches.expanduser())
     backup_details = parse_backups(args.backups.expanduser())
-    #logging.warning(backup_details)
+    logging.warning(backup_details)
+    #logging.warning(patch_details)
     assemble_db(backup_details, patch_details)
 
 
