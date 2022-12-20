@@ -22,7 +22,7 @@ logging.basicConfig(
 db_file = Path("unit_db.csv")
 
 #add change Headings to change output order or fields
-HEADINGS = "MU", "Train", "Train_Region", "Train_Brand", "PN_model", "PN_Ident", "PN_INDEX", "Hardware Number", "Unit Type", "Unit Type_HEX", "Unit class", "Unit class_HEX", "Feat:Tel", "Feat:NAV", "Feat:DAB", "Feat:Sirius", "Feat:LTE", "Feature byte", "Variant2", "Region", "Region_HEX", "Brand", "Brand_HEX", "Platform", "Platform_HEX", "LC:byte_17_Skinning", "LC:byte_18_Screenings", "LC:Model ID", "Long Coding LC", "Dataset Number", "ifs_header_checksum", "ifs_SHA1", "ifs_header_checksum_patch", "ifs_file_name_checksum_patch", "RCC_offset", "SHA1_patch", "FAZIT ID", "MIB SN"
+HEADINGS = "MU", "Train", "Train_Region", "Train_Brand", "PN1", "PN_model", "PN_Ident", "PN_INDEX", "Hardware Number", "Unit Type", "Unit Type_HEX", "Unit class", "Unit class_HEX", "Feat:Tel", "Feat:NAV", "Feat:DAB", "Feat:Sirius", "Feat:LTE", "Feature byte", "Variant2", "Region", "Region_HEX", "Brand", "Brand_HEX", "Platform", "Platform_HEX", "LC:byte_17_Skinning", "LC:byte_18_Screenings", "LC:Model ID", "Long Coding LC", "Dataset Number", "ifs_header_checksum", "ifs_file_name_checksum_patch", "ifs_SHA1", "ifs_header_checksum_patch", "RCC_offset", "SHA1_patch", "FAZIT ID", "MIB SN"
 
 # adjust to equired output format. ',' = rest of the world ';' for Germany
 # adding \t in front of the delimiter will prevent conversion to date/number in Excel
