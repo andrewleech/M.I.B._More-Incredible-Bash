@@ -7,7 +7,7 @@ def parse_eeprom(data):
         ("PN2",                          0x8B,   10,     str_stripped), 
         ("Hardware Number",              0x96,    3,     string), 
         ("Variant2",                     0xBA,   13,     str_stripped), 
-        ("Train",                        0x3A0,  19,     str_stripped), 
+        ("Train",                        0x3A0,  21,     str_stripped), 
         ("MU",                           0x3B9,   4,     string), 
         ("Unit Type",                    0xDD,    1,     lookup(unit_type)),
         ("Unit Type_HEX",                0xDD,    1,     hexlify),
