@@ -22,7 +22,7 @@ logging.basicConfig(
 db_file = Path("unit_db.csv")
 
 #add change Headings to change output order or fields
-HEADINGS = "MU", "Train", "Train_Region", "Train_Brand", "PN_model", "PN_Ident", "PN_INDEX", "Hardware Number", "Unit Type", "Unit Type_HEX", "Unit class", "Unit class_HEX", "Feat:Tel", "Feat:NAV", "Feat:DAB", "Feat:Sirius", "Feat:LTE", "Feature byte", "Variant2", "Region", "Region_HEX", "Brand", "Brand_HEX", "Platform", "Platform_HEX", "LC:byte_17_Skinning", "LC:byte_18_Screenings", "LC:Model ID", "Long Coding LC", "Dataset Number", "ifs_header_checksum", "ifs_SHA1", "ifs_header_checksum_patch", "RCC_offset", "SHA1_patch", "FAZIT ID", "MIB SN"
+HEADINGS = "MU", "Train", "Train_Region", "Train_Brand", "PN_model", "PN_Ident", "PN_INDEX", "Hardware Number", "Unit Type", "Unit Type_HEX", "Unit class", "Unit class_HEX", "Feat:Tel", "Feat:NAV", "Feat:DAB", "Feat:Sirius", "Feat:LTE", "Feature byte", "Variant2", "Region", "Region_HEX", "Brand", "Brand_HEX", "Platform", "Platform_HEX", "LC:byte_17_Skinning", "LC:byte_18_Screenings", "LC:Model ID", "Long Coding LC", "Dataset Number", "ifs_header_checksum", "ifs_SHA1", "ifs_header_checksum_patch", "ifs_file_name_checksum_patch", "RCC_offset", "SHA1_patch", "FAZIT ID", "MIB SN"
 
 # adjust to equired output format. ',' = rest of the world ';' for Germany
 # adding \t in front of the delimiter will prevent conversion to date/number in Excel
@@ -43,10 +43,11 @@ def assemble_db(backup_details, patch_details):
         elif len(pt) > 1:
             logging.warning(f"can't match patch from {list(pt.keys())} patches for: {train}")
         else:
-            ifs, ifs_sha, ifs_patch, offset = list(pt.values())[0]
+            ifs, ifs_sha, ifs_patch, offset, ifs_checksum = list(pt.values())[0]
             detail["SHA1_patch"] = ifs_sha
             detail["ifs_header_checksum_patch"] = ifs_patch
             detail["RCC_offset"] = offset
+            detail["ifs_file_name_checksum_patch"] = ifs_checksum
             #print(ifs_patch)
         
         detail["PN_model"], detail["PN_INDEX"], detail["PN_Ident"] = PN1_split(detail["PN1"])
@@ -67,7 +68,7 @@ def train_split(train):
     return region, brand
 
 def ifs_name_split(file_name):
-    MU, ifs1, ifs2, ifs3, offset, ifs_checksum = file_name.upper().split("-")
+    MU, ifs1, ifs2, ifs3, offset, ifs_checksum = file_name.lower().split("-")
     return offset, ifs_checksum
 
 def PN1_split(pn1):
@@ -129,7 +130,7 @@ def parse_patches(patches_dir: Path):
                 ifs_patch_details = parse_ifs(data, "_patch")
                 #print(ifs_patch_details)
 
-        patch_details[train] = (ifs, sha1, ifs_patch_details["ifs_header_checksum_patch"], offset)
+        patch_details[train] = (ifs, sha1, ifs_patch_details["ifs_header_checksum_patch"], offset, ifs_checksum)
 
     return patch_details
 
@@ -144,7 +145,7 @@ def main():
     patch_details = parse_patches(args.patches.expanduser())
     backup_details = parse_backups(args.backups.expanduser())
     #logging.warning(backup_details)
-    logging.warning(patch_details)
+    #logging.warning(patch_details)
     assemble_db(backup_details, patch_details)
 
 
