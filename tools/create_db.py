@@ -103,8 +103,7 @@ def parse_backups(backups_dir: Path):
             details = parse_eeprom(data)
         for ifs in backup.glob("*-ifs-root-part2*.ifs"):
             details["ifs_SHA1"] = sha1sum(ifs)
-        for ifs_header in backup.glob("*-ifs-root-part2*.ifs"):
-            with ifs_header.open("rb") as data:
+            with ifs.open("rb") as data:
                 ifs_details = parse_ifs(data)
                 details.update(ifs_details)
 
@@ -121,14 +120,9 @@ def parse_patches(patches_dir: Path):
         train = ifs.parent.name.replace("_PATCH", "")
         logging.warning(f"{train}: {ifs}")
         sha1 = sha1sum(ifs)
-        for ifs_header in patches.glob("*-ifs-root-part2*.ifs"):
-            #print(ifs_header.name)
-            offset, ifs_checksum = ifs_name_split(ifs_header.name.replace(".ifs", ""))
-            #print(offset)
-            #print(ifs_checksum)
-            with ifs_header.open("rb") as data:
-                ifs_patch_details = parse_ifs(data, "_patch")
-                #print(ifs_patch_details)
+        offset, ifs_checksum = ifs_name_split(ifs.name.replace(".ifs", ""))
+        with ifs.open("rb") as data:
+            ifs_patch_details = parse_ifs(data, "_patch")
 
         patch_details[train] = (ifs, sha1, ifs_patch_details["ifs_header_checksum_patch"], offset, ifs_checksum)
 
