@@ -24,7 +24,7 @@ db_file = Path("unit_db.csv")
 # change Headings to change output order or fields
 HEADINGS = "MU", "Train", "Train_Region", "Train_Brand", "PN1", "PN_model", "PN_Ident", "PN_INDEX", "Hardware Number", "Unit Type", "Unit Type_HEX", "Unit class", "Unit class_HEX", "Feat:Tel", "Feat:NAV", "Feat:DAB", "Feat:Sirius", "Feat:LTE", "Feature byte", "Variant2", "Region", "Region_HEX", "Brand", "Brand_HEX", "Platform", "Platform_HEX", "LC:byte_17_Skinning", "LC:byte_18_Screenings", "LC:Model ID", "Long Coding LC", "Dataset Number", "ifs_header_checksum", "ifs_file_name_checksum_patch", "ifs_SHA1", "ifs_header_checksum_patch", "RCC_offset", "SHA1_patch", "FAZIT ID", "MIB SN"
 
-# adjust to equired output format. ',' = rest of the world ';' for Germany
+# adjust to required output format. ',' = rest of the world ';' for Germany
 # adding \t in front of the delimiter will prevent conversion to date/number in Excel
 FIELD_SEP = "\t;" 
 
@@ -37,6 +37,7 @@ def assemble_db(backup_details, patch_details):
         train_brand, train_region = train_split(train)
         detail["Train_Brand"] = train_brand
         detail["Train_Region"] = train_region
+        logging.warning(f"Detail train: {train}")
         pt = {t:d for t, d in patch_details.items() if t.startswith(train)}
         logging.info(f"patch details: {pt}")
         #checksum = detail["ifs_header_checksum"]
@@ -54,8 +55,6 @@ def assemble_db(backup_details, patch_details):
             detail["ifs_header_checksum_patch"] = ifs_patch
             detail["RCC_offset"] = offset
             detail["ifs_file_name_checksum_patch"] = ifs_checksum
-            #detail["ifs_header_checksum"] = header_checksum
-            #print(header_checksum)
         
         detail["PN_model"], detail["PN_INDEX"], detail["PN_Ident"] = PN1_split(detail["PN1"])
         
@@ -88,7 +87,7 @@ def PN1_split(pn1):
         PN_INDEX = ''
     return PN_model, PN_INDEX, PN_Ident
 
-def convert(filename):
+def convert_eeprom(filename):
     logging.info('Converting: ' + str(filename))
     with filename.open('r') as txt_file:
         lines = txt_file.readlines()
@@ -117,12 +116,15 @@ def parse_backups(backups_dir: Path):
         logging.info(f"Backup: {backup.name}")
         #logging.info(f"{eeprom.stem}.bin")
         if not (backup / f"{eeprom.stem}.bin").exists() or os.path.getsize(backup / f"{eeprom.stem}.bin") != 8192:
-            logging.info(f"*.bin not found")
+            if not (backup / f"{eeprom.stem}.bin").exists():
+                logging.warning(f"*.bin not found")
+            else:
+                logging.warning(f"*.bin size is not equal to 8192 bytes")
             txt_file = backup / f"{eeprom.stem}.txt"
             if not txt_file.exists():
                 logging.error(f"No corresponding .txt file found for: {eeprom}")
                 continue
-            convert(txt_file)
+            convert_eeprom(txt_file)
             eeprom = backup / f"{eeprom.stem}.bin"
             if not eeprom.exists():
                 logging.error(f"Conversion failed for: {txt_file}")
@@ -156,7 +158,9 @@ def parse_patches(patches_dir: Path):
 
         patch_details[train] = (ifs, sha1, ifs_patch_details["ifs_header_checksum_patch"], offset, ifs_checksum)
         pt = {t:d for t, d in patch_details.items() if t.startswith(train)}
-        logging.info(f"Patch details: {pt}")
+        logging.info(f"Patch details parsed: {pt}")
+
+    logging.info(f"Output compiled patch details: {patch_details}")
 
     return patch_details
 

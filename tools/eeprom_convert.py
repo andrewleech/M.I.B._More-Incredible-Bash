@@ -1,19 +1,6 @@
 import os, sys, logging, pathlib
 
-# def convert(filename):
-    # print('Processing: ' + filename)
-    # txtFile = open(os.path.splitext(filename)[0] + '.txt', 'r')
-    # Lines = txtFile.readlines()
-    # print('Writing to: ' + os.path.splitext(filename)[0] + '.bin')
-    # binFile = open(os.path.splitext(filename)[0] + '.bin', 'wb')
-    # for line in Lines:
-        # if line.find('0x') > -1:
-            # binFile.write(bytearray.fromhex(line.strip().split('\t')[1].replace(' ','')))
-    # binFile.close()
-    # txtFile.close()
-    # print('Done.');
-
-def convert(filename):
+def convert_eeprom(filename):
     logging.info('Converting: ' + str(filename))
     print(f"Filename: {filename}")
     with filename.open('r') as txt_file:
@@ -29,7 +16,7 @@ def convert(filename):
 match len(sys.argv):
     case 2:
         #convert('.\\' + os.path.splitext(sys.argv[1])[0])
-        convert(pathlib.Path(sys.argv[1]))
+        convert_eeprom(pathlib.Path(sys.argv[1]))
     case 1:
         for root, dirs, files in os.walk("."):
             path = root.split(os.sep)
